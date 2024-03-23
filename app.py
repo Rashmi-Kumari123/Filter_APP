@@ -6,17 +6,18 @@ from werkzeug.utils import secure_filename
 from PIL import Image
 import cv2
 import numpy as np 
-
-############################## Database Connection #######################################
-
 import psycopg2
+############################## Database Connection #######################################
+database_url = "dpg-cnvc5t6ct0pc73dmc3ng-a.oregon-postgres.render.com"
+host = f"{database_url}"
+
 
 def connect_db():
     conn = psycopg2.connect(
-        dbname="UsersInfo",
-        user="postgres",
-        password="2375rash",
-        host="localhost"
+        dbname="filter_app",
+        user="filter_app_user",
+        password="c9me2zEZMvl7e4ZzpDVEQBl5ioHSrpyD",
+        host=host
     )
     return conn
 
@@ -238,4 +239,5 @@ def edit():
 
     return render_template("index.html")
        
-app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True,host = '0.0.0.0')
