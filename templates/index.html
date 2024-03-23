@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMAGE EDITOR APP</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-image: url('https://source.unsplash.com/random/1920x1080/?nature');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container1 {
+            margin-top: 50px;
+            width: 30%;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .container2 {
+            margin-top: 50px;
+            width: 60%;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        .custom-range {
+            width: 70%;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: rgba(240, 240, 240, 0.8);
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: #ffffff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #f52bd0;
+        }
+
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999; /* Ensure it's on top of other elements */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container1">
+        IMAGE EDITOR APP
+    </div>
+
+    <div class="container2">
+        <form action="/edit" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="operation"><b>Choose Operation:</b></label>
+                <select class="form-control" id="operation" name="operation">
+                    <option value="cgray">Convert to Grayscale</option>
+                    <option value="crop">Crop</option>
+                    <option value="rotate">Rotate</option>
+                    <option value="blur">Blur</option>
+                    <option value="cool">Cool</option>
+                    <option value="vintage">Vintage</option>
+                    <option value="brightness">Adjust Brightness</option>
+                    <option value="saturation">Adjust Saturation</option>
+
+
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="file"><b>Choose Image:</b></label>
+                <input type="file" class="form-control-file" id="file" name="file">
+            </div>
+            <div id="params">
+                <!-- Parameter sliders will be dynamically added here -->
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+        <div id="output">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li>{{ message | safe }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+
+    
+    <!-- Logout button in top-right corner -->
+    <form action="/logout" method="GET" class="logout-btn">
+        <button type="submit" class="btn btn-danger">Logout</button>
+    </form>
+
+    <script>
+        // Function to dynamically add parameter sliders based on selected operation
+        document.getElementById("operation").addEventListener("change", function () {
+            var operation = this.value;
+            var paramsDiv = document.getElementById("params");
+            paramsDiv.innerHTML = ""; // Clear previous parameters
+            if (operation === "crop") {
+                paramsDiv.innerHTML = `
+                    <div class="form-group">
+                        <label for="x">X:</label>
+                        <input type="range" class="custom-range" id="x" name="x" min="0" max="100" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="y">Y:</label>
+                        <input type="range" class="custom-range" id="y" name="y" min="0" max="100" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="w">Width:</label>
+                        <input type="range" class="custom-range" id="w" name="w" min="0" max="100" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="h">Height:</label>
+                        <input type="range" class="custom-range" id="h" name="h" min="0" max="100" value="0">
+                    </div>
+                `;
+            } else if (operation === "rotate") {
+                paramsDiv.innerHTML = `
+                    <div class="form-group">
+                        <label for="angle">Angle:</label>
+                        <input type="range" class="custom-range" id="angle" name="angle" min="0" max="360" value="0">
+                    </div>
+                `;
+            } else if (operation === "blur") {
+                paramsDiv.innerHTML = `
+                    <div class="form-group">
+                        <label for="blur_amount">Blur Amount:</label>
+                        <input type="range" class="custom-range" id="blur_amount" name="blur_amount" min="1" max="31" value="1">
+                    </div>
+                `;
+            } else if (operation === "brightness" || operation === "saturation") {
+                paramsDiv.innerHTML = `
+                    <div class="form-group">
+                        <label for="${operation}_factor">${operation.charAt(0).toUpperCase() + operation.slice(1)} Factor:</label>
+                        <input type="range" class="custom-range" id="${operation}_factor" name="${operation}_factor" min="-100" max="100" value="0">
+                    </div>
+                `;
+            } else if (operation === "cool" || operation === "vintage") {
+                paramsDiv.innerHTML = `
+                    <div class="form-group">
+                        <label for="${operation}_intensity">Filter Intensity:</label>
+                        <input type="range" class="custom-range" id="${operation}_intensity" name="${operation}_intensity" min="0" max="100" value="50">
+                    </div>
+                `;
+
+                const filterIntensityInput = document.getElementById(`${operation}_intensity`);
+                filterIntensityInput.addEventListener('input', () => {
+                    const filterIntensity = filterIntensityInput.value;
+                    previewImage.style.filter = `${operation}(${filterIntensity}%)`;
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
