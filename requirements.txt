@@ -13,3 +13,4 @@ gunicorn==21.2.0
 numpy==1.26.3
 Werkzeug == 3.0.1
 scikit-image == 0.22.0
+opencv-python == 4.9.0.80
