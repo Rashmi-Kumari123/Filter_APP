@@ -8,19 +8,17 @@ import cv2
 import numpy as np 
 import psycopg2
 ############################## Database Connection #######################################
-database_url = "dpg-cnvc5t6ct0pc73dmc3ng-a.oregon-postgres.render.com"
+database_url = "dpg-cnmn6gmn7f5s73d7s5f0-a.oregon-postgres.render.com"
 host = f"{database_url}"
-
-
+app = Flask(__name__)
 def connect_db():
     conn = psycopg2.connect(
-        dbname="filter_app",
-        user="filter_app_user",
-        password="c9me2zEZMvl7e4ZzpDVEQBl5ioHSrpyD",
+        dbname="dhp2024_muqf",
+        user="dhp2024_muqf_user",
+        password="VDnibngKxYSg9RYrQRNEdKz0QFm2f0v6",
         host=host
     )
     return conn
-
 conn = connect_db()
 cur = conn.cursor()
 
